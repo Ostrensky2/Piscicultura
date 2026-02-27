@@ -1,0 +1,447 @@
+?<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width,initial-scale=1.0" name="viewport" />
+  <title>Piscicultura 2026-1</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script>tailwind.config = { darkMode: "class", theme: { extend: { colors: { primary: "#137fec", secondary: "#10b981", "background-light": "#f6f7f8", "background-dark": "#0f172a", "surface-light": "#ffffff", "surface-dark": "#1e293b" }, fontFamily: { display: ["Inter", "sans-serif"] } } } }</script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100dvh
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24
+    }
+
+    .screen {
+      display: none
+    }
+
+    .screen.active {
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh
+    }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 4px;
+      border-radius: 2px;
+      background: #dbe0e6;
+      outline: none;
+      cursor: pointer
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #137fec;
+      cursor: pointer
+    }
+
+    .chip {
+      display: inline-block;
+      white-space: nowrap;
+      padding: 5px 14px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid #e2e8f0;
+      color: #64748b;
+      flex-shrink: 0
+    }
+
+    .chip.selected {
+      background: #137fec;
+      border-color: #137fec;
+      color: white
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none
+    }
+  </style>
+</head>
+
+
+<!-- LOGIN -->
+<div id="screen-login" class="screen active">
+  <div class="flex flex-col items-center justify-center min-h-dvh px-6 bg-background-light">
+    <div class="w-full max-w-sm">
+      <div class="flex flex-col items-center mb-8">
+        <div
+          class="h-16 w-16 rounded-2xl bg-primary flex items-center justify-center text-white text-2xl font-black mb-4 shadow-lg shadow-primary/30">
+          P</div>
+        <h1 class="text-2xl font-black">Piscicultura 2026-1</h1>
+        <p class="text-slate-500 text-sm mt-1">Prof. Antonio Ostrensky Neto</p>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 space-y-4">
+        <div>
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1 block">E-mail</label>
+          <input id="login-email" type="email" autocomplete="email" placeholder="professor@ufpr.br"
+            class="w-full rounded-xl border border-slate-200 py-3 px-4 text-sm outline-none focus:ring-2 focus:ring-primary/30" />
+        </div>
+        <div>
+          <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1 block">Senha</label>
+          <input id="login-pass" type="password" autocomplete="current-password" placeholder="••••••••"
+            class="w-full rounded-xl border border-slate-200 py-3 px-4 text-sm outline-none focus:ring-2 focus:ring-primary/30" />
+        </div>
+        <p id="login-error" class="text-red-500 text-xs min-h-[1rem]"></p>
+        <button onclick="signIn()"
+          class="w-full py-3.5 rounded-xl bg-primary text-white font-bold text-sm hover:bg-primary/90 transition active:scale-95">
+          Entrar
+        </button>
+      </div>
+      <p class="text-center text-xs text-slate-400 mt-6">Acesso restrito ao professor da disciplina.</p>
+    </div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="screen-home" class="screen">
+  <div class="sticky top-0 z-50 bg-white dark:bg-surface-dark border-b border-slate-200 dark:border-slate-800">
+    <div class="flex items-center justify-between px-4 pt-10 pb-3">
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm">
+          AO</div>
+        <div>
+          <h1 class="text-xl font-bold">Piscicultura 2026-1</h1>
+          <p id="hdr-email" class="text-xs text-slate-500">Prof. Antonio Ostrensky Neto</p>
+        </div>
+      </div>
+      <button onclick="signOut()" title="Sair"
+        class="relative h-10 w-10 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center hover:bg-red-50 transition">
+        <span class="material-symbols-outlined text-[22px] text-slate-400"
+          style="font-variation-settings:'FILL' 0">logout</span>
+      </button>
+    </div>
+    <div class="grid grid-cols-4 gap-2 px-4 pb-4">
+      <button onclick="navigate('nova-interacao')"
+        class="flex flex-col items-center gap-1 p-2 rounded-xl bg-primary text-white shadow-lg shadow-primary/30">
+        <span class="material-symbols-outlined text-[26px]">add_circle</span><span
+          class="text-[10px] font-bold">Interação</span>
+      </button>
+      <button onclick="navigate('alunos')"
+        class="flex flex-col items-center gap-1 p-2 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-100 dark:border-slate-700">
+        <span class="material-symbols-outlined text-[26px]">groups</span><span
+          class="text-[10px] font-semibold">Alunos</span>
+      </button>
+      <button onclick="navigate('grupos')"
+        class="flex flex-col items-center gap-1 p-2 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-100 dark:border-slate-700">
+        <span class="material-symbols-outlined text-[26px]">diversity_3</span><span
+          class="text-[10px] font-semibold">Grupos</span>
+      </button>
+      <button onclick="navigate('relatorios')"
+        class="flex flex-col items-center gap-1 p-2 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-100 dark:border-slate-700">
+        <span class="material-symbols-outlined text-[26px]">bar_chart</span><span
+          class="text-[10px] font-semibold">Relat�rios</span>
+      </button>
+      <button onclick="importFromLocalStorage()"
+        class="flex flex-col items-center gap-1 p-2 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-100 dark:border-slate-700">
+        <span class="material-symbols-outlined text-[26px]" style="font-variation-settings:'FILL' 0">upload</span><span
+          class="text-[10px] font-semibold">Importar</span>
+      </button>
+    </div>
+  </div>
+  <main class="flex-1 px-4 pt-6 pb-28">
+    <section class="mb-6">
+      <div
+        class="bg-gradient-to-br from-primary to-blue-600 rounded-2xl p-5 text-white shadow-xl shadow-blue-500/20 relative overflow-hidden">
+        <div class="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+        <p class="text-sm text-blue-100 mb-3">Resumo da Turma</p>
+        <div class="flex items-end justify-between" id="home-stats">
+          <div>
+            <div class="text-3xl font-bold" id="stat-total">0</div>
+            <div class="text-xs text-blue-100 mt-1">Total Interações</div>
+          </div>
+          <div class="h-8 w-px bg-white/20 mx-3"></div>
+          <div>
+            <div class="text-3xl font-bold" id="stat-avg">—</div>
+            <div class="text-xs text-blue-100 mt-1">Média Geral</div>
+          </div>
+          <div class="h-8 w-px bg-white/20 mx-3"></div>
+          <div>
+            <div class="text-3xl font-bold">23</div>
+            <div class="text-xs text-blue-100 mt-1">Alunos</div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section>
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-bold">Últimas Interações</h2>
+        <button onclick="navigate('relatorios')" class="text-xs font-semibold text-primary">Ver todas</button>
+      </div>
+      <div class="flex flex-col gap-3" id="interactions-list"></div>
+      <p id="no-interactions" class="text-sm text-slate-400 text-center py-8 hidden">Nenhuma interação registrada
+        ainda.<br />Use o botão "Interação" para começar.</p>
+    </section>
+  </main>
+</div>
+
+<!-- NOVA INTERACAO -->
+<div id="screen-nova-interacao" class="screen">
+  <div class="sticky top-0 z-50 bg-white dark:bg-surface-dark border-b border-slate-200 dark:border-slate-800">
+    <div class="flex items-center justify-between px-4 py-3">
+      <button onclick="goBack()" class="p-2 -ml-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+        <span class="material-symbols-outlined text-2xl" style="font-variation-settings:'FILL' 0">arrow_back</span>
+      </button>
+      <h2 class="text-lg font-bold flex-1 text-center pr-8">Nova Interação</h2>
+      <div class="w-8"></div>
+    </div>
+    <p class="text-xs font-bold text-primary uppercase tracking-wider text-center pb-3">Piscicultura 2026-1</p>
+  </div>
+  <div class="bg-white dark:bg-surface-dark px-4 py-4 shadow-sm border-b border-slate-100 dark:border-slate-800">
+    <div class="relative">
+      <span
+        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px] pointer-events-none"
+        style="font-variation-settings:'FILL' 0">search</span>
+      <input id="ni-search" type="text" placeholder="Buscar aluno..."
+        class="w-full h-12 pl-10 pr-4 rounded-xl bg-background-light dark:bg-background-dark placeholder:text-slate-400 focus:ring-2 focus:ring-primary/30 text-base outline-none"
+        oninput="niFilter()" onfocus="niShowDrop()" onblur="setTimeout(niHideDrop,200)" />
+    </div>
+    <div id="ni-dropdown"
+      class="hidden mt-1 bg-white dark:bg-surface-dark border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg overflow-hidden max-h-48 overflow-y-auto">
+    </div>
+    <div id="ni-selected"
+      class="hidden mt-3 flex items-center gap-3 p-3 bg-primary/10 rounded-xl border border-primary/20">
+      <div id="ni-av"
+        class="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+      </div>
+      <div class="flex-1 min-w-0">
+        <p id="ni-name" class="font-bold text-sm truncate"></p>
+        <p id="ni-meta" class="text-xs text-slate-500"></p>
+      </div>
+      <button onclick="niClear()" class="text-slate-400 hover:text-red-500">
+        <span class="material-symbols-outlined text-xl" style="font-variation-settings:'FILL' 0">close</span>
+      </button>
+    </div>
+  </div>
+  <div class="flex-1 overflow-y-auto pb-32 px-4 pt-5 space-y-5 max-w-lg mx-auto w-full">
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <label class="text-sm font-bold flex items-center gap-2"><span
+            class="material-symbols-outlined text-primary text-xl">stars</span>Nota da Interação</label>
+        <span id="ni-score-val" class="text-2xl font-bold text-primary">8.5</span>
+      </div>
+      <div class="bg-white dark:bg-surface-dark p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <input type="range" id="ni-score" min="0" max="10" step="0.5" value="8.5"
+          oninput="document.getElementById('ni-score-val').textContent=parseFloat(this.value).toFixed(this.value%1===0?0:1)" />
+        <div class="flex justify-between mt-2 text-xs text-slate-400 font-medium">
+          <span>0</span><span>2.5</span><span>5.0</span><span>7.5</span><span>10</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Data e Hora</label>
+      <input type="datetime-local" id="ni-datetime"
+        class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark py-3 px-4 text-slate-900 dark:text-slate-100 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm" />
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tipo de Interação</label>
+        <div class="relative">
+          <select id="ni-type"
+            class="w-full appearance-none rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark py-3 pl-4 pr-10 text-sm outline-none focus:border-primary">
+            <option>Sala de aula</option>
+            <option>Reunião de grupo</option>
+            <option>Apresentação</option>
+            <option>Visita técnica</option>
+            <option>Chat</option>
+            <option>Entrega</option>
+          </select>
+          <span
+            class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]"
+            style="font-variation-settings:'FILL' 0">expand_more</span>
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Papel do Aluno</label>
+        <div class="relative">
+          <select id="ni-role"
+            class="w-full appearance-none rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark py-3 pl-4 pr-10 text-sm outline-none focus:border-primary">
+            <option>Membro</option>
+            <option>Líder</option>
+            <option>Coordenação</option>
+          </select>
+          <span
+            class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]"
+            style="font-variation-settings:'FILL' 0">expand_more</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Tema Abordado</label>
+      <input type="text" id="ni-theme" placeholder="Ex: Qualidade da água, Gestão..."
+        class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark py-3 px-4 placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm" />
+      <div class="flex gap-2 overflow-x-auto pb-1 mt-2 no-scrollbar">
+        <span class="chip" onclick="niChip(this)">Qualidade da Água</span>
+        <span class="chip" onclick="niChip(this)">Nutrição</span>
+        <span class="chip" onclick="niChip(this)">Gestão</span>
+        <span class="chip" onclick="niChip(this)">Sanidade</span>
+        <span class="chip" onclick="niChip(this)">Reprodução</span>
+        <span class="chip" onclick="niChip(this)">Mercado</span>
+        <span class="chip" onclick="niChip(this)">Biossegurança</span>
+        <span class="chip" onclick="niChip(this)">Viabilidade</span>
+      </div>
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Observações</label>
+      <textarea rows="4" id="ni-notes" placeholder="Detalhes sobre o desempenho ou comportamento do aluno..."
+        class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark py-3 px-4 placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary outline-none resize-none text-sm leading-relaxed"></textarea>
+    </div>
+  </div>
+  <div
+    class="fixed bottom-0 left-0 right-0 z-50 bg-white/90 dark:bg-surface-dark/90 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800 px-4 pb-6 pt-3">
+    <button onclick="niSave()"
+      class="w-full h-14 bg-primary hover:bg-blue-600 text-white font-bold text-lg rounded-xl shadow-lg shadow-primary/30 flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+      <span class="material-symbols-outlined">check_circle</span>Salvar Interação
+    </button>
+  </div>
+</div>
+
+<!-- GRUPOS -->
+<div id="screen-grupos" class="screen">
+  <div class="sticky top-0 z-20 bg-white dark:bg-surface-dark border-b border-slate-200 dark:border-slate-800">
+    <div class="flex items-center justify-between px-4 py-3">
+      <button onclick="goBack()" class="p-2 -ml-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800">
+        <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">arrow_back</span>
+      </button>
+      <h2 class="text-lg font-bold flex-1 text-center px-2">Grupos Temáticos</h2>
+      <div class="w-10"></div>
+    </div>
+    <div class="px-4 pb-3">
+      <div class="relative">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><span
+            class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 0">search</span></span>
+        <input id="g-search"
+          class="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl py-2.5 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary/50 placeholder-slate-500 outline-none"
+          placeholder="Buscar aluno ou grupo" type="text" oninput="renderGroups()" />
+      </div>
+    </div>
+  </div>
+  <div class="px-4 pt-5 pb-2">
+    <h3 class="text-2xl font-bold">Piscicultura 2026-1</h3>
+    <p class="text-sm text-slate-500 mt-1">Gestão de hierarquia e consultoria simulada</p>
+  </div>
+  <div class="flex-1 px-4 pt-2 pb-28 space-y-3" id="groups-list"></div>
+</div>
+
+<!-- ALUNOS -->
+<div id="screen-alunos" class="screen">
+  <div class="sticky top-0 z-20 bg-white dark:bg-surface-dark border-b border-slate-200 dark:border-slate-800">
+    <div class="flex items-center justify-between px-4 py-3">
+      <button onclick="goBack()" class="p-2 -ml-2 rounded-full hover:bg-slate-100"><span
+          class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">arrow_back</span></button>
+      <h2 class="text-lg font-bold flex-1 text-center px-2">Alunos</h2>
+      <div class="w-10"></div>
+    </div>
+    <div class="px-4 pb-3">
+      <div class="relative">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><span
+            class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 0">search</span></span>
+        <input id="a-search"
+          class="w-full bg-slate-100 dark:bg-slate-800 rounded-xl py-2.5 pl-10 pr-4 text-sm border-none outline-none"
+          placeholder="Buscar aluno..." type="text" oninput="renderAlunos()" />
+      </div>
+    </div>
+  </div>
+  <div class="flex-1 px-4 pt-4 pb-10 space-y-2" id="alunos-list"></div>
+</div>
+
+<!-- PERFIL -->
+<div id="screen-perfil" class="screen">
+  <header
+    class="sticky top-0 z-50 bg-white dark:bg-surface-dark border-b border-slate-100 dark:border-slate-800 flex items-center px-4 py-3 justify-between">
+    <button onclick="goBack()"
+      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full hover:bg-slate-100 transition-colors">
+      <span class="material-symbols-outlined text-[24px]" style="font-variation-settings:'FILL' 0">arrow_back</span>
+    </button>
+    <h2 class="text-lg font-bold flex-1 text-center">Perfil do Aluno</h2>
+    <div class="w-12"></div>
+  </header>
+  <main class="flex-1 overflow-y-auto pb-10" id="perfil-content"></main>
+</div>
+
+<!-- RELATORIOS -->
+<div id="screen-relatorios" class="screen">
+  <div class="sticky top-0 z-20 bg-white dark:bg-surface-dark border-b border-slate-200 dark:border-slate-800">
+    <div class="flex items-center justify-between px-4 py-3">
+      <button onclick="goBack()" class="p-2 -ml-2 rounded-full hover:bg-slate-100"><span
+          class="material-symbols-outlined" style="font-variation-settings:'FILL' 0">arrow_back</span></button>
+      <h2 class="text-lg font-bold flex-1 text-center px-2">Relatórios</h2>
+      <button onclick="exportCSV()" class="flex items-center gap-1 text-primary text-sm font-bold px-2">
+        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings:'FILL' 0">download</span>CSV
+      </button>
+    </div>
+  </div>
+  <div class="px-4 pt-5 pb-2 space-y-3">
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1 block">Aluno</label>
+        <div class="relative">
+          <select id="r-aluno" onchange="renderRelatorios()"
+            class="w-full appearance-none rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark py-2.5 pl-3 pr-8 text-sm outline-none">
+            <option value="">Todos</option>
+          </select>
+          <span
+            class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[18px]"
+            style="font-variation-settings:'FILL' 0">expand_more</span>
+        </div>
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1 block">Grupo</label>
+        <div class="relative">
+          <select id="r-grupo" onchange="renderRelatorios()"
+            class="w-full appearance-none rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark py-2.5 pl-3 pr-8 text-sm outline-none">
+            <option value="">Todos</option>
+          </select>
+          <span
+            class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[18px]"
+            style="font-variation-settings:'FILL' 0">expand_more</span>
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1 block">Data inicial</label>
+        <input type="date" id="r-de" onchange="renderRelatorios()"
+          class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark py-2.5 px-3 text-sm outline-none" />
+      </div>
+      <div>
+        <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1 block">Data final</label>
+        <input type="date" id="r-ate" onchange="renderRelatorios()"
+          class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark py-2.5 px-3 text-sm outline-none" />
+      </div>
+    </div>
+    <div>
+      <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1 block">Tema</label>
+      <input type="text" id="r-tema" oninput="renderRelatorios()" placeholder="Filtrar por tema..."
+        class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-surface-dark py-2.5 px-3 text-sm outline-none" />
+    </div>
+    <div id="r-summary" class="grid grid-cols-2 gap-3 pt-1"></div>
+  </div>
+  <div id="r-list" class="flex-1 px-4 pb-20 space-y-2 overflow-y-auto"></div>
+</div>
+
+<script defer src="app.js"></script>
+</body>
+
+</html>
