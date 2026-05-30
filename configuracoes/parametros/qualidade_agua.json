@@ -1,0 +1,10 @@
+{
+  "temperaturaIdealMinC": 26,
+  "temperaturaIdealMaxC": 30,
+  "oxigenioDissolvidoMinMgL": 5,
+  "phIdealMin": 6.5,
+  "phIdealMax": 8.5,
+  "amoniaMaxMgL": 0.5,
+  "nitritoMaxMgL": 0.3,
+  "transparenciaIdealCm": 40
+}

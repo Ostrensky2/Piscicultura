@@ -1,0 +1,11 @@
+{
+  "locale": "pt-BR",
+  "moeda": "BRL",
+  "peso": "kg",
+  "biomassa": "kg",
+  "producao": "t",
+  "area": "ha",
+  "volume": "m³",
+  "temperatura": "°C",
+  "oxigenio": "mg/L"
+}

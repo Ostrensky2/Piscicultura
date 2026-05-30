@@ -1,0 +1,7 @@
+{
+  "conversaoAlimentarAlvo": 1.55,
+  "mortalidadeMaximaAceitavelPct": 10,
+  "sobrevivenciaAlvoPct": 90,
+  "pesoDespescaAlvoG": 850,
+  "cicloProdutivoMeses": 7
+}
