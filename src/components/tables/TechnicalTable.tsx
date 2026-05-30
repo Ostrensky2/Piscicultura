@@ -15,7 +15,7 @@ interface TechnicalTableProps<T> {
   compacto?: boolean
 }
 
-export function TechnicalTable<T extends Record<string, unknown>>({ colunas, dados, vazio = 'Sem registros.', compacto }: TechnicalTableProps<T>) {
+export function TechnicalTable<T>({ colunas, dados, vazio = 'Sem registros.', compacto }: TechnicalTableProps<T>) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
